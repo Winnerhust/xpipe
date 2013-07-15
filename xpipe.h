@@ -1,12 +1,13 @@
-#include <iostream>
+#ifndef __XPIPEH
+#define __XPIPEH
+
 #include <unistd.h>
 #include <string>
 #include <string.h>
 #include <stdio.h>
 using namespace std;
-
 /*
-  无名管道的C++封装类，用于父子进程进行通信
+	无名管道的C++封装类，用于父子进程进行通信
 	作者 ：陈学友
 	时间 ：2013年7月15日 20:30:58
 	邮 箱：chen_xueyou@163.com
@@ -41,3 +42,4 @@ private:
 	long 	m_bufsize;
 	char *	m_buf;
 };
+#endif
