@@ -1,3 +1,6 @@
+#ifndef __XPIPECPP
+#define __XPIPECPP
+
 #include "xpipe.h"
 xpipe::xpipe()
 :m_readable(true),m_writeable(true)
@@ -83,3 +86,4 @@ long xpipe::Bufsize(long newbufsize)
 	
 	return m_bufsize;
 }
+#endif
