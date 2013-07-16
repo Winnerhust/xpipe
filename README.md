@@ -14,3 +14,48 @@ unix下一切皆文件，管道也不例外。无名管道pipe定义在<unistd.h
 	cout<<fpathconf(fd[0],_PC_PIPE_BUF)<<endl;
 ```
 在我的 `Ubuntu10.10` 下为`4096`字节，刚好一页大小。而在109的`AIX`服务器上，管道大小的限制则为`32768`字节。
+
+读写管道使用系统函数read和write,如：
+```c++
+	write(m_fd[1],content.c_str(),content.length());
+```
+这能体现管道作为文件的本质，但不能体现通信的意图，因此我将管道的读写封装为与socket中发送和接收。
+```c++
+	ssize_t xpipe::send(void *buf, size_t n)
+	{
+		return write(m_fd[1], buf, n);
+	}
+	ssize_t xpipe::recv(void *buf, size_t nbytes)
+	{
+		return read(m_fd[0], buf, nbytes);
+	}
+```
+使用中，通信的内容常常为字符串，上述两个函数不仅能满足这个要求，还能传递一些简单结构体消息（稍后在讨论），但是每次都要输入长度。为简化开发，我将`send`和`recv`重载，作为特化方法，方便字符串的传递。使用方法非常简单，如：
+```c++
+	xpipe x;
+	x.send("Whose your daddy?");
+	string rs;
+	x.recv(rs);
+```
+关于简单结构体，需要作个说明，这里指的是由C++基本类型组合而成的结构体，如：
+```c++
+	class child
+	{
+	public:
+		long id;
+		char name[20];
+	};
+```
+注意：**string不是基本类型**。
+传递结构体消息示例如下：
+```c++
+	xpipe x;
+	child cc;
+	cc.id=10;
+	strcpy(cc.name,"PAYBY");
+	x.send((child *)&cc,sizeof(child));
+	/*-------------------------*/
+	child dd;
+	x.recv((child *)&dd,sizeof(child));	
+```
+
