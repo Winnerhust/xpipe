@@ -1,7 +1,8 @@
-#ifndef __XPIPECPP
-#define __XPIPECPP
+#ifndef __XPIPECPP__
+#define __XPIPECPP__
 
 #include "xpipe.h"
+
 xpipe::xpipe()
 :m_readable(true),m_writeable(true),m_buf(NULL)
 {
@@ -12,7 +13,7 @@ xpipe::xpipe()
 	}
 	//检测系统设置的管道限制大小
 	m_bufsize=fpathconf(m_fd[0],_PC_PIPE_BUF);
-
+	
 }
 xpipe::~xpipe()
 {
@@ -37,8 +38,8 @@ void xpipe::send(const string &content)
 }
 void  xpipe::recv(string &content)
 {
-	if(m_buf==NULL)
-	{//lasy run
+	if (m_buf==NULL)
+	{//lazy run
 		m_buf=new char[m_bufsize];
 		if (m_buf==NULL)
 		{
@@ -48,6 +49,25 @@ void  xpipe::recv(string &content)
 	memset(m_buf,0,m_bufsize);
 	read(m_fd[0],m_buf,m_bufsize);
 	content=string(m_buf);
+}
+//返回当前管道所扮演到角色
+string xpipe::role() const
+{
+	if (m_writeable&&m_readable)
+	{
+		return "sender and receiver";
+	}
+	if (m_writeable)
+	{
+		return "sender";
+	}
+	if (m_readable)
+	{
+		return "receiver";
+	}
+
+	return "none";
+	
 }
 /*关闭读端口*/
 void xpipe::DisReadable()
