@@ -3,7 +3,7 @@
 
 #include "xpipe.h"
 xpipe::xpipe()
-:m_readable(true),m_writeable(true)
+:m_readable(true),m_writeable(true),m_buf(NULL)
 {
 	int success=pipe(m_fd);
 	if(success<0)
@@ -12,11 +12,7 @@ xpipe::xpipe()
 	}
 	//检测系统设置的管道限制大小
 	m_bufsize=fpathconf(m_fd[0],_PC_PIPE_BUF);
-	m_buf=new char[m_bufsize];
-	if (m_buf==NULL)
-	{
-		throw puts("memory not enough!");
-	}
+
 }
 xpipe::~xpipe()
 {
@@ -41,6 +37,14 @@ void xpipe::send(const string &content)
 }
 void  xpipe::recv(string &content)
 {
+	if(m_buf==NULL)
+	{//lasy run
+		m_buf=new char[m_bufsize];
+		if (m_buf==NULL)
+		{
+			throw puts("memory not enough!");
+		}
+	}
 	memset(m_buf,0,m_bufsize);
 	read(m_fd[0],m_buf,m_bufsize);
 	content=string(m_buf);
