@@ -127,7 +127,19 @@ unix下一切皆文件，管道也不例外。无名管道pipe定义在<unistd.h
 		wait(&ret);
 	}
 ```
-预期结果为：
+在这个示例中，父进程通过`x`管道向子进程发送信息，而子进程通过管道`y`向父进程发送信息。对父进程而言，通过`x`发送信息，只需两步为
+```c++
+	x.senderonly();//指明角色为仅发送信息
+	...
+	x.send(x_item);//发送信息
+```
+对子进程而言，通过`x`接收信息，同样只需两步
+```c++
+	x.receiveronly();//指明角色为仅接收信息
+	string rs;
+	x.recv(rs);//接收信息，保存到rs中
+```
+关于管道`y`的使用也一样，预期结果为：
 ```
 parent process:whose your daddy?
 child process:my father is Ligang!
