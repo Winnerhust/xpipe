@@ -4,8 +4,10 @@ xpipe
 **无名管道的C++封装类**，用于父子进程进行通信
 
 unix下一切皆文件，管道也不例外。无名管道pipe定义在<unistd.h>中。
-  #include <unistd.h>
+```c++
+	#include <unistd.h>
 	int pipe(int fd[2]);
+```
 其中fd[0]是读端，fd[1]是写端，fd[1]的输出是fd[0]的输入,因此管道是一个有向的半双工通信方式。使用write(fd[1],...)和read(fd[0],...)对管道中的信息进行读写。无名管道通常运用于父子进程间通信。关闭读端或者写端是使用close函数，同文件句柄一样，关闭后不能重新打开。如果关闭后使用该端，系统会发送一个SIGPIPE的信号。作为一个文件，管道有一个缓存大小限制，这是一个运行时限制，使用fpathconf函数可以查看其大小，类型名为_PC_PIPE_BUF.
 	eg:
 	cout<<fpathconf(fd[0],_PC_PIPE_BUF)<<endl;
