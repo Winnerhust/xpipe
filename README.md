@@ -134,4 +134,4 @@ child process:my father is Ligang!
 ```
 
 ----
-有问题，请给我留言，我的[CSDN博客](http://blog.csdn.net/qq910894904)|[新浪微博](http://weibo.com/1892488770/profile?topnav=1&wvr=5)|[个人网站](http://www.cxueyou.sinaapp.com/)
+有问题，请给我留言，我的[CSDN博客](http://blog.csdn.net/qq910894904)|[新浪微博](http://weibo.com/1892488770)|[个人网站](http://www.cxueyou.sinaapp.com/)
