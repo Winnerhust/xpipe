@@ -1,5 +1,5 @@
-#ifndef __XPIPEH
-#define __XPIPEH
+#ifndef __XPIPEH__
+#define __XPIPEH__
 
 #include <unistd.h>
 #include <string>
@@ -23,19 +23,22 @@ public:
 ///常用方法特化
 	void 	send(const string &content);
 	void 	recv(string &content);
+//确定通信角色
+	void	senderonly(){DisReadable();}
+	void	receiveronly(){DisWriteable();}
 
-//读写关闭操作
+//属性操作
+	string	role() const;
+
+	long 	Bufsize(long newbufsize=0);
+private:
+	//读写关闭操作
 	void 	DisReadable();
 	void 	DisWriteable();
 
-//属性操作
-	bool 	Readable(){return m_readable;}
-	bool 	Writeable(){return m_writeable;}
-
-	long 	Bufsize(long newbufsize=0);
 	/* data */
 private:
-	int 	m_fd[2];
+	int 		m_fd[2];
 	bool 	m_readable;
 	bool 	m_writeable;
 	
