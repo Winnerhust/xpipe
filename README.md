@@ -60,4 +60,78 @@ unix下一切皆文件，管道也不例外。无名管道pipe定义在<unistd.h
 	child dd;
 	x.recv((child *)&dd,sizeof(child));	
 ```
+通信设计
+----
+文件是常见的通信媒介。但对文件的读写必须要加上读写的角色信息才能体现通信的过程。一个简单的单向通信包含消息发送方和消息接收方。对管道读写时常常有可以看到接收进程（读进程）关闭写端口，发送进程（写进程）关闭读端口，这样做是为了确保信息流向的单一，以免信息从接收进程流向发送进程。在负责进程中，这依然不够直观。单向的信息流动中，一方仅仅是发送者（`senderonly`）,另一方仅仅是接收者（`receiveronly`）。因此，在父子进程通信过程中，给他们指定角色就可以了。
+示例代码如下：
+```c++
+	xpipe x;
+	pid_t pid=fork();
+	string item="whose your daddy";
+	if (pid==0)
+	{//child process
+		x.receiveronly();
+		
+		string rs;
+		x.recv(rs);
+		//check point
+		assert(rs==item);
+		exit(0);	
+	}
+	else if (pid>0)
+	{//parent process
+		int ret;
+		x.senderonly();
+		x.send(item);
+		wait(&ret);
+	}
+```
+在示例代码中父进程被指定为发送者，不能通过`x`管道进行接收信息，子进程被指定为接收者，不能通过`x`管道进行发送信息。要实现父子进程的互相通信。可以在指定另一个管道，将子进程指定为发送者，父进程指定为接收者。（见使用示例）
 
+使用示例
+----
+父子进程互相通信
+```c++
+xpipe x;
+	xpipe y;
+	pid_t pid=fork();
+	string x_item="whose your daddy?";
+	string y_item="my father is Ligang!";
+	if (pid==0)
+	{//child process
+		x.receiveronly();
+		y.senderonly();
+
+		string rs;
+		x.recv(rs);
+		//check point
+		assert(rs==x_item);
+		
+		y.send(y_item);
+		cout<<"child process:"<<y_item<<endl;
+		exit(0);	
+	}
+	else if (pid>0)
+	{//parent process
+		int ret;
+		x.senderonly();
+		y.receiveronly();
+
+		x.send(x_item);
+		cout<<"parent process:"<<x_item<<endl;
+		
+		string ts;
+		y.recv(ts);
+		assert(ts==y_item);
+
+		wait(&ret);
+	}
+```
+预期结果为：
+```
+parent process:whose your daddy?
+child process:my father is Ligang!
+```
+
+----
+有问题，请[邮件联系我](chenxueyou@163.com)
