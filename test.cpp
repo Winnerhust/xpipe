@@ -20,6 +20,7 @@ void test1()
 	//check point
 	assert(x.Bufsize()==20);
 }
+
 /*test read/recv*/
 /////////////////////////////////////
 class childreq
@@ -35,7 +36,7 @@ void test2()
 	pid_t pid=fork();
 	if (pid==0)
 	{
-		x.DisWriteable();
+		x.receiveronly();
 
 		childreq dd;
 		x.recv((childreq *)&dd,sizeof(childreq));
@@ -46,7 +47,7 @@ void test2()
 	}
 	else if (pid>0)
 	{
-		x.DisReadable();
+		x.senderonly();
 
 		childreq cc;
 		cc.recid=10;
@@ -65,8 +66,8 @@ void test3()
 	pid_t pid=fork();
 	string item="whose your daddy";
 	if (pid==0)
-	{
-		x.DisWriteable();
+	{//child process
+		x.receiveronly();
 		
 		string rs;
 		x.recv(rs);
@@ -75,10 +76,63 @@ void test3()
 		exit(0);	
 	}
 	else if (pid>0)
-	{
+	{//parent process
 		int ret;
-		x.DisReadable();
+		x.senderonly();
 		x.send(item);
+		wait(&ret);
+	}
+}
+/*test role*/
+void test4()
+{
+	xpipe x;
+	assert(x.role()=="sender and receiver");
+	x.senderonly();
+	assert(x.role()=="sender");
+	x.receiveronly();
+	assert(x.role()=="none");
+
+	xpipe y;
+	y.receiveronly();
+	assert(y.role()=="receiver");
+
+}
+/*test read/recv*/
+void test5()
+{
+	xpipe x;
+	xpipe y;
+	pid_t pid=fork();
+	string x_item="whose your daddy?";
+	string y_item="my father is Ligang!";
+	if (pid==0)
+	{//child process
+		x.receiveronly();
+		y.senderonly();
+
+		string rs;
+		x.recv(rs);
+		//check point
+		assert(rs==x_item);
+		
+		y.send(y_item);
+		cout<<"child process:"<<y_item<<endl;
+		exit(0);	
+	}
+	else if (pid>0)
+	{//parent process
+		int ret;
+		x.senderonly();
+		y.receiveronly();
+
+		x.send(x_item);
+		cout<<"parent process:"<<x_item<<endl;
+		
+		string ts;
+		y.recv(ts);
+		assert(ts==y_item);
+
 		wait(&ret);
 	}
 }
@@ -87,5 +141,7 @@ int main(int argc, char const *argv[])
 	test1();
 	test2();
 	test3();
+	test4();
+	test5();
 	cout<<"pass all the tests"<<endl;
 }
