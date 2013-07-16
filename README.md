@@ -46,7 +46,7 @@ unix下一切皆文件，管道也不例外。无名管道pipe定义在<unistd.h
 		char name[20];
 	};
 ```
-注意：**string不是基本类型**。
+注意：\*string不是基本类型\*。
 传递结构体消息示例如下：
 ```c++
 	xpipe x;
