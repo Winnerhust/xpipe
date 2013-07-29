@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <assert.h>
 #include <sys/types.h>
@@ -15,10 +14,10 @@ void test1()
 	int fd[2];
 	pipe(fd);
 	//check point
-	assert(x.Bufsize()==fpathconf(fd[0],_PC_PIPE_BUF));
+	assert(x.Bufsize() == fpathconf(fd[0],_PC_PIPE_BUF));
 	x.Bufsize(20);
 	//check point
-	assert(x.Bufsize()==20);
+	assert(x.Bufsize() == 20);
 }
 
 /*test read/recv*/
@@ -33,24 +32,22 @@ public:
 void test2()
 {
 	xpipe x;
-	pid_t pid=fork();
-	if (pid==0)
-	{
+	pid_t pid = fork();
+	if (pid == 0){
 		x.receiveronly();
 
 		childreq dd;
 		x.recv((childreq *)&dd,sizeof(childreq));
 		//check point
-		assert(dd.recid==10);
+		assert(dd.recid == 10);
 		assert(!strcmp(dd.billtype,"PAYBY"));
 		exit(0);
 	}
-	else if (pid>0)
-	{
+	else if (pid > 0){
 		x.senderonly();
 
 		childreq cc;
-		cc.recid=10;
+		cc.recid = 10;
 		strcpy(cc.billtype,"PAYBY");
 
 		x.send((childreq *)&cc,sizeof(childreq));
@@ -63,20 +60,18 @@ void test2()
 void test3()
 {
 	xpipe x;
-	pid_t pid=fork();
-	string item="whose your daddy";
-	if (pid==0)
-	{//child process
+	pid_t pid = fork();
+	string item = "whose your daddy";
+	if (pid == 0){//child process
 		x.receiveronly();
 		
 		string rs;
 		x.recv(rs);
 		//check point
-		assert(rs==item);
+		assert(rs == item);
 		exit(0);	
 	}
-	else if (pid>0)
-	{//parent process
+	else if (pid > 0){//parent process
 		int ret;
 		x.senderonly();
 		x.send(item);
@@ -87,15 +82,15 @@ void test3()
 void test4()
 {
 	xpipe x;
-	assert(x.role()=="sender and receiver");
+	assert(x.role() == "sender and receiver");
 	x.senderonly();
-	assert(x.role()=="sender");
+	assert(x.role() == "sender");
 	x.receiveronly();
-	assert(x.role()=="none");
+	assert(x.role() == "none");
 
 	xpipe y;
 	y.receiveronly();
-	assert(y.role()=="receiver");
+	assert(y.role() == "receiver");
 
 }
 /*test read/recv*/
@@ -103,25 +98,23 @@ void test5()
 {
 	xpipe x;
 	xpipe y;
-	pid_t pid=fork();
-	string x_item="whose your daddy?";
-	string y_item="my father is Ligang!";
-	if (pid==0)
-	{//child process
+	pid_t pid = fork();
+	string x_item = "whose your daddy?";
+	string y_item = "my father is Ligang!";
+	if (pid == 0){//child process
 		x.receiveronly();
 		y.senderonly();
 
 		string rs;
 		x.recv(rs);
 		//check point
-		assert(rs==x_item);
+		assert(rs == x_item);
 		
 		y.send(y_item);
 		cout<<"child process:"<<y_item<<endl;
 		exit(0);	
 	}
-	else if (pid>0)
-	{//parent process
+	else if (pid > 0){//parent process
 		int ret;
 		x.senderonly();
 		y.receiveronly();
@@ -131,7 +124,7 @@ void test5()
 		
 		string ts;
 		y.recv(ts);
-		assert(ts==y_item);
+		assert(ts == y_item);
 
 		wait(&ret);
 	}
