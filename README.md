@@ -6,7 +6,7 @@ xpipe
 
 
 
-unix下一切皆文件，管道也不例外。无名管道pipe定义在<unistd.h>中。
+unix下一切皆文件，管道也不例外。无名管道pipe定义在unistd.h中。
 ```c++
 	#include <unistd.h>
 	int pipe(int fd[2]);
